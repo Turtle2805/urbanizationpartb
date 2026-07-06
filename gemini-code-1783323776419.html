@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ms Lê Hằng English - IELTS Reading Mock Test Gamification</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Quicksand', sans-serif;
+            user-select: text;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Đồng bộ dải loang màu hồng Pastel, vàng sáng, xanh ngọc chuyển động liên tục */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(-45deg, #FFB7B2, #FFDAC1, #E2F0CB, #B5EAEA);
+            background-size: 400% 400%;
+            animation: gradientBG 14s ease infinite;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Họa tiết SVG lơ lửng hình tòa nhà đô thị và mầm cây xanh chuẩn chủ đề bài đọc */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            opacity: 0.18;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cpath d='M10 50h15v25H10zm25-25h15v50H35zm25 15h15v35H60z' fill='%238854C0' fill-opacity='0.4'/%3E%3Cpath d='M15 15c2 0 4 2 4 4s-2 4-4 4-4-2-4-4 2-4 4-4zm45 5c1.5 0 3 1.5 3 3s-1.5 3-3 3-3-1.5-3-3 1.5-3 3-3z' fill='%2300C9A7' fill-opacity='0.5'/%3E%3C/svg%3E");
+        }
+
+        /* Top Control Bar */
+        .top-bar {
+            background: rgba(255, 255, 255, 0.96);
+            padding: 10px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            z-index: 10;
+            border-bottom: 3px solid #6C5CE7;
+        }
+
+        .teacher-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .teacher-info .sub-title {
+            font-size: 8.5pt;
+            font-weight: 700;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .teacher-info .main-title {
+            font-size: 11.5pt;
+            font-weight: 900;
+            color: #6C5CE7;
+        }
+
+        .timer-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #FFF3CD;
+            border: 2px solid #FFEBAA;
+            padding: 6px 16px;
+            border-radius: 14px;
+            box-shadow: 0 4px 0 #FFEBAA;
+        }
+
+        .timer-display {
+            font-size: 13pt;
+            font-weight: 900;
+            color: #B7791F;
+            min-width: 65px;
+            text-align: center;
+        }
+
+        .timer-btn {
+            background: #6C5CE7;
+            color: white;
+            border: none;
+            padding: 5px 14px;
+            border-radius: 8px;
+            font-weight: 900;
+            font-size: 9pt;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #4B3FA3;
+            transition: all 0.1s;
+        }
+
+        .timer-btn:hover { transform: scale(1.03); }
+
+        /* Tab Navigation System */
+        .tab-nav-bar {
+            display: flex;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 8px 24px 0 24px;
+            gap: 8px;
+            z-index: 9;
+            align-items: center;
+            border-bottom: 2px solid #E2E8F0;
+        }
+
+        .tab-link {
+            background: #E2E8F0;
+            border: none;
+            padding: 10px 20px;
+            font-size: 9.5pt;
+            font-weight: 900;
+            color: #4A5568;
+            border-radius: 12px 12px 0 0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-link.active {
+            background: #FFFFFF;
+            color: #6C5CE7;
+            box-shadow: 0 -3px 10px rgba(0,0,0,0.04);
+            padding-bottom: 12px;
+            border: 2px solid #6C5CE7;
+            border-bottom: none;
+        }
+
+        .global-progress-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+            width: 260px;
+            padding-bottom: 6px;
+        }
+
+        .progress-bar-bg {
+            background: #EDF2F7;
+            width: 100%;
+            height: 14px;
+            border-radius: 7px;
+            border: 1.5px solid #CBD5E1;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background: #00D26A;
+            width: 0%;
+            height: 100%;
+            transition: width 0.4s ease;
+        }
+
+        .progress-text {
+            font-size: 9.5pt;
+            font-weight: 900;
+            color: #2D3748;
+            min-width: 45px;
+        }
+
+        /* Split-Screen Framework */
+        .workspace {
+            display: none;
+            flex: 1;
+            grid-template-columns: 1fr 1fr;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .workspace.active {
+            display: grid;
+        }
+
+        .panel-left, .panel-right {
+            overflow-y: auto;
+            padding: 25px;
+            height: 100%;
+        }
+
+        .panel-left {
+            background: rgba(255, 255, 255, 0.88);
+            border-right: 3px dashed #6C5CE7;
+        }
+
+        .panel-right {
+            background: rgba(255, 255, 255, 0.75);
+        }
+
+        /* Chế độ bôi đen highlight tự động biến đổi sang hồng pastel nhạt nhã nhặn cực đẹp */
+        .panel-left ::selection {
+            background: #FFB7B2 !important;
+            color: #000000 !important;
+        }
+
+        /* Typography & Elements */
+        .passage-title {
+            font-size: 15pt;
+            font-weight: 900;
+            color: #2C3E50;
+            margin-bottom: 22px;
+            border-left: 6px solid #6C5CE7;
+            padding-left: 12px;
+            line-height: 1.4;
+        }
+
+        .paragraph-block {
+            margin-bottom: 25px;
+            padding: 10px;
+            border-radius: 14px;
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+        }
+
+        /* Khung định vị dẫn chứng khi click icon chuột */
+        .paragraph-block.located-flash {
+            background-color: #FFF9C4 !important;
+            border: 2px dashed #FBC02D !important;
+            transform: scale(1.01);
+        }
+
+        .paragraph-text {
+            font-size: 11pt;
+            color: #2D3748;
+            line-height: 1.75;
+            text-align: justify;
+            margin: 0 0 12px 0;
+        }
+
+        .translate-btn {
+            background: #E2F0CB;
+            border: 2px solid #C3E6CB;
+            color: #2D3748;
+            padding: 6px 14px;
+            font-size: 8.5pt;
+            font-weight: 900;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #C3E6CB;
+            transition: transform 0.1s;
+        }
+
+        .translate-btn:hover { transform: scale(1.03); }
+
+        .translation-box {
+            display: none;
+            margin-top: 10px;
+            padding: 14px;
+            background: #F8FAFC;
+            border-left: 4px solid #00CEC9;
+            border-radius: 8px;
+            font-size: 10pt;
+            color: #4A5568;
+            line-height: 1.65;
+            text-align: justify;
+        }
+
+        /* Glossary Box UI */
+        .glossary-wrapper {
+            margin-top: 40px;
+            background: #FFFFFF;
+            border-radius: 20px;
+            padding: 22px;
+            border: 3px solid #6C5CE7;
+            box-shadow: 0 6px 0 rgba(0,0,0,0.03);
+        }
+
+        .glossary-title {
+            font-size: 11.5pt;
+            font-weight: 900;
+            color: #6C5CE7;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .glossary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .glossary-table th {
+            background: #6C5CE7;
+            color: white;
+            font-weight: 900;
+            padding: 10px;
+            font-size: 9.5pt;
+            text-align: left;
+        }
+
+        .glossary-table td {
+            padding: 10px;
+            border-bottom: 1px solid #E2E8F0;
+            font-size: 9.5pt;
+            color: #2D3748;
+        }
+
+        .glossary-table tr:hover { background: #F8FAFC; }
+
+        /* Exercise Section UI (Right) */
+        .exercise-card {
+            background: #FFFFFF;
+            border-radius: 20px;
+            padding: 22px;
+            margin-bottom: 25px;
+            box-shadow: 0 6px 0 rgba(0,0,0,0.03);
+            border: 3px solid #E4E7EB;
+            transition: all 0.2s;
+        }
+
+        .question-header {
+            font-size: 11pt;
+            font-weight: 900;
+            color: #2C3E50;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .option-btn {
+            display: block;
+            width: 100%;
+            background: #FFFFFF;
+            border: 3px solid #E4E7EB;
+            border-radius: 14px;
+            padding: 13px 18px;
+            font-size: 10.5pt;
+            font-weight: 700;
+            color: #4A5568;
+            text-align: left;
+            cursor: pointer;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 0 #E4E7EB;
+            transition: all 0.1s ease;
+        }
+
+        .option-btn:hover {
+            transform: translateY(-2px) scale(1.005);
+            background: #F8FAFC;
+        }
+
+        /* 3D Gamification Feedback Colors */
+        .correct-ui {
+            background-color: #00D26A !important;
+            border-color: #00A855 !important;
+            color: white !important;
+            box-shadow: 0 4px 0 #00A855 !important;
+        }
+
+        .wrong-ui {
+            background-color: #FF4757 !important;
+            border-color: #D63031 !important;
+            color: white !important;
+            box-shadow: 0 4px 0 #D63031 !important;
+        }
+
+        @keyframes shakeUI {
+            0%, 100% { transform: translateX(0); }
+            25%, 75% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+        }
+
+        .shake-effect { animation: shakeUI 0.3s ease-in-out; }
+
+        /* Formative Inputs */
+        .select-scrollable {
+            width: 100%;
+            background: #FFFFFF;
+            border: 3px solid #E4E7EB;
+            padding: 12px 16px;
+            font-size: 10.5pt;
+            font-weight: 700;
+            color: #4A5568;
+            border-radius: 14px;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 0 4px 0 #E4E7EB;
+            margin-bottom: 10px;
+        }
+
+        .input-fill-blank {
+            width: 65%;
+            padding: 11px 16px;
+            font-size: 11pt;
+            font-weight: 700;
+            border: 3px solid #E4E7EB;
+            border-radius: 14px;
+            outline: none;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .btn-check-blank {
+            background: #00CEC9;
+            color: white;
+            border: none;
+            padding: 11px 22px;
+            font-size: 10pt;
+            font-weight: 900;
+            border-radius: 14px;
+            margin-left: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #009E9B;
+        }
+
+        /* Explanation UI Box */
+        .explain-box {
+            display: none;
+            margin-top: 15px;
+            background: #F8FAFC;
+            border-left: 5px solid #6C5CE7;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
+        }
+
+        .explain-row {
+            font-size: 9.5pt;
+            color: #4A5568;
+            margin-bottom: 6px;
+            line-height: 1.55;
+        }
+
+        .locate-sync-btn {
+            background: #EDF2F7;
+            border: 1.5px solid #CBD5E1;
+            padding: 5px 12px;
+            font-size: 8.5pt;
+            font-weight: 900;
+            color: #4A5568;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .locate-sync-btn:hover { background: #E2E8F0; }
+
+        /* Bottom Control Submit & Modal */
+        .bottom-panel {
+            background: white;
+            padding: 14px;
+            text-align: center;
+            border-top: 2px solid #E2E8F0;
+            z-index: 5;
+        }
+
+        .submit-all-btn {
+            background: #FDCB6E;
+            color: #2C3E50;
+            border: 3px solid #E6A115;
+            padding: 12px 55px;
+            font-size: 13pt;
+            font-weight: 900;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #E6A115;
+        }
+
+        .submit-all-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 #E6A115;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 35px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            border: 4px solid #6C5CE7;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        .modal-score-lbl {
+            font-size: 35pt;
+            font-weight: 900;
+            color: #6C5CE7;
+            margin: 15px 0;
+        }
+
+        .modal-comment-lbl {
+            font-size: 11pt;
+            font-weight: 700;
+            color: #4A5568;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .modal-close-btn {
+            background: #6C5CE7;
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 10.5pt;
+            font-weight: 900;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #4B3FA3;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="confetti-canvas" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:99999;"></canvas>
+
+    <div class="top-bar">
+        <div class="teacher-info">
+            <span class="sub-title">IELTS READING MOCK TEST</span>
+            <span class="main-title">Giáo viên tạo: Ms Lê Hằng English</span>
+        </div>
+        <div class="timer-container">
+            ⏱️ <span class="timer-display" id="time-lbl">25:00</span>
+            <button class="timer-btn" id="time-toggle-btn" onclick="toggleTimer()">BẮT ĐẦU TÍNH GIỜ LÀM BÀI</button>
+        </div>
+    </div>
+
+    <div class="tab-nav-bar">
+        <button class="tab-link active" onclick="switchTab(1)">Cloze Text 1</button>
+        <button class="tab-link" onclick="switchTab(2)">Cloze Text 2</button>
+        <button class="tab-link" onclick="switchTab(3)">Reading 1</button>
+        <button class="tab-link" onclick="switchTab(4)">Reading 2</button>
+        <button class="tab-link" onclick="switchTab(5)">Reading 3</button>
+
+        <div class="global-progress-box">
+            <span class="progress-text" style="min-width:60px;">Tiến độ bài:</span>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-fill-node"></div>
+            </div>
+            <span class="progress-text" id="progress-txt-node">0%</span>
+        </div>
+    </div>
+
+    <div class="workspace active" id="tab-pane-1">
+        <div class="panel-left" id="p1-left-scroll">
+            <div class="passage-title">Urbanization Core and World Bank Mission</div>
+            
+            <div class="paragraph-block" id="p1-para-1">
+                <p class="paragraph-text">Cities are the engines of global economic growth and job creation, making them the primary (1) __________ of the World Bank Group’s mission of ending poverty and boosting shared prosperity on a livable planet. Today, over 4 billion people live in cities, a number expected to surge as the continuous rural exodus draws more people toward metropolitan centers. By 2050, nearly 7 in 10 people worldwide will live in urban areas, making the resilience of these spaces more critical than ever.</p>
+                <button class="translate-btn" onclick="toggleTranslation('p1-tr-1')">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box" id="p1-tr-1">Các thành phố là động cơ của tăng trưởng kinh tế toàn cầu và tạo việc làm, khiến chúng trở thành phương tiện/công cụ cốt lõi cho sứ mệnh của Nhóm Ngân hàng Thế giới trong việc xóa nghèo và thúc đẩy thịnh vượng chung trên một hành tinh đáng sống. Ngày nay, hơn 4 tỷ người sống ở các thành phố, một con số dự kiến sẽ tăng mạnh khi làn sóng rời bỏ nông thôn liên tục thu hút nhiều người hơn về các trung tâm đô thị lớn. Đến năm 2050, gần 7/10 người trên toàn thế giới sẽ sống ở các khu vực đô thị, khiến khả năng phục hồi của các không gian này trở nên quan trọng hơn bao giờ hết.</div>
+            </div>
+
+            <div class="paragraph-block" id="p1-para-2">
+                <p class="paragraph-text">However, rapid urbanization is a double-edged sword. As capital flows into neglected districts, many cities face the complex challenge of (2) __________, where rising property values often lead to the displacement of low-income inhabitants. Consequently, metropolitan areas must now manage the soaring (3) __________ for efficient infrastructure and affordable housing to ensure that urban renewal remains inclusive rather than exclusionary. This pressure is further intensified by rising rates of global conflict, often leading to severe social stratification and spatial inequality.</p>
+                <button class="translate-btn" onclick="toggleTranslation('p1-tr-2')">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box" id="p1-tr-2">Tuy nhiên, đô thị hóa nhanh chóng là một con dao hai lưỡi. Khi dòng vốn đổ vào các quận bị bỏ quên, nhiều thành phố phải đối mặt với thách thức phức tạp mang tên chỉnh trang đô thị, nơi giá trị bất động sản tăng cao thường dẫn đến sự di dời của những cư dân có thu nhập thấp. Do đó, các khu vực đô thị lớn hiện phải quản lý sự khao khát/nhu cầu tăng vọt đối với cơ sở hạ tầng hiệu quả và nhà ở giá phải chăng để đảm bảo rằng công cuộc đổi mới đô thị mang tính bao trùm thay vì loại trừ. Áp lực này càng trở nên gay gắt hơn do tỷ lệ xung đột toàn cầu gia tăng, thường dẫn đến sự phân tầng xã hội và bất bình đẳng không gian nghiêm trọng.</div>
+            </div>
+
+            <div class="paragraph-block" id="p1-para-3">
+                <p class="paragraph-text">To mitigate these challenges, subnational finance becomes paramount. Local governments need robust financial systems to invest in services and development initiatives. Strategic policy coordination is essential to address the current infrastructure (4) __________ while preventing the marginalization of vulnerable communities. By empowering local authorities, the World Bank Group is working to create jobs and secure economic growth—ensuring cities remain vibrant centers of opportunity. Ultimately, the goal is to utilize the latent (5) __________ of these hubs to ensure long-term sustainability for all.</p>
+                <button class="translate-btn" onclick="toggleTranslation('p1-tr-3')">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box" id="p1-tr-3">Để giảm thiểu những thách thức này, tài chính cấp dưới quốc gia trở nên tối quan trọng. Chính quyền địa phương cần các hệ thống tài chính mạnh mẽ để đầu tư vào các dịch vụ và sáng kiến phát triển. Phối hợp chính sách chiến lược là cần thiết để giải quyết tình trạng thiếu hụt cơ sở hạ tầng hiện tại trong khi ngăn chặn sự gạt ra ngoài lề của các cộng đồng dễ bị tổn thương. Bằng cách trao quyền cho các chính quyền địa phương, Nhóm Ngân hàng Thế giới đang nỗ lực tạo việc làm và đảm bảo tăng trưởng kinh tế—đảm bảo các thành phố vẫn là trung tâm cơ hội sôi động. Cuối cùng, mục tiêu là tận dụng nguồn lực nguồn vốn tiềm ẩn của các đầu mối này để đảm bảo tính bền vững lâu dài cho tất cả mọi người.</div>
+            </div>
+
+            <div class="glossary-wrapper">
+                <div class="glossary-title">📊 GLOSSARY (BẢNG TRÍCH XUẤT TỪ VỰNG NÂNG CAO - CLOZE 1)</div>
+                <table class="glossary-table">
+                    <thead>
+                        <tr>
+                            <th>Từ vựng</th>
+                            <th>Từ loại</th>
+                            <th>Nghĩa tiếng Việt</th>
+                            <th>Cặp từ đồng nghĩa (Trong bài &lt;=&gt; Câu hỏi)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Vehicle</td><td>n</td><td>Phương tiện, công cụ truyền tải</td><td>Primary tool / central driving driver</td></tr>
+                        <tr><td>Gentrification</td><td>n</td><td>Sự chỉnh trang/cao cấp hóa đô thị</td><td>Urban renewal / structural upscale</td></tr>
+                        <tr><td>Thirst</td><td>n</td><td>Sự khát khao, nhu cầu cực lớn</td><td>Soaring demand / strong desire</td></tr>
+                        <tr><td>Deficit</td><td>n</td><td>Sự thâm hụt, sự thiếu hụt</td><td>Shortage / scarcity</td></tr>
+                        <tr><td>Capital</td><td>n</td><td>Nguồn vốn, tài nguyên cốt lõi</td><td>Latent financial resource</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel-right">
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 1:</strong> Choose the best option for blank (1):</div>
+                <button class="option-btn" onclick="checkMCQ(1, 'A', 'B')">A. habitat</button>
+                <button class="option-btn" onclick="checkMCQ(1, 'B', 'B')">B. vehicle</button>
+                <button class="option-btn" onclick="checkMCQ(1, 'C', 'B')">C. frontier</button>
+                <button class="option-btn" onclick="checkMCQ(1, 'D', 'B')">D. residence</button>
+                <div class="explain-box" id="ex-box-1"></div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 2:</strong> Choose the best option for blank (2):</div>
+                <button class="option-btn" onclick="checkMCQ(2, 'A', 'A')">A. gentrification</button>
+                <button class="option-btn" onclick="checkMCQ(2, 'B', 'A')">B. urbanization</button>
+                <button class="option-btn" onclick="checkMCQ(2, 'C', 'A')">C. modernization</button>
+                <button class="option-btn" onclick="checkMCQ(2, 'D', 'A')">D. renovation</button>
+                <div class="explain-box" id="ex-box-2"></div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 3:</strong> Choose the best option for blank (3):</div>
+                <button class="option-btn" onclick="checkMCQ(3, 'A', 'C')">A. digestion</button>
+                <button class="option-btn" onclick="checkMCQ(3, 'B', 'C')">B. hunger</button>
+                <button class="option-btn" onclick="checkMCQ(3, 'C', 'C')">C. thirst</button>
+                <button class="option-btn" onclick="checkMCQ(3, 'D', 'C')">D. appetite</button>
+                <div class="explain-box" id="ex-box-3"></div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 4:</strong> Choose the best option for blank (4):</div>
+                <button class="option-btn" onclick="checkMCQ(4, 'A', 'A')">A. deficit</button>
+                <button class="option-btn" onclick="checkMCQ(4, 'B', 'A')">B. shortage</button>
+                <button class="option-btn" onclick="checkMCQ(4, 'C', 'A')">C. failure</button>
+                <button class="option-btn" onclick="checkMCQ(4, 'D', 'A')">D. scarcity</button>
+                <div class="explain-box" id="ex-box-4"></div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 5:</strong> Choose the best option for blank (5):</div>
+                <button class="option-btn" onclick="checkMCQ(5, 'A', 'B')">A. estate</button>
+                <button class="option-btn" onclick="checkMCQ(5, 'B', 'B')">B. capital</button>
+                <button class="option-btn" onclick="checkMCQ(5, 'C', 'B')">C. fortune</button>
+                <button class="option-btn" onclick="checkMCQ(5, 'D', 'B')">D. treasure</button>
+                <div class="explain-box" id="ex-box-5"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="workspace" id="tab-pane-2">
+        <div class="panel-left" id="p2-left-scroll">
+            <div class="passage-title">Urbanization and Plant Evolutionary Loss</div>
+            
+            <div class="paragraph-block" id="p2-para-1">
+                <p class="paragraph-text">All over the globe, the urbanization of landscapes is increasing at an unprecedented rate. Experts suggest that a significant portion of the land surface expected to be urban by 2030 has not been built on at all. How this rapid expansion will impact biological diversity will only be apparent in retrospect. Recently, researchers have revealed, on the basis of historical data, how the (1) __________ has transformed over three centuries of growth, providing a grim forecast for the future of our natural heritage.</p>
+                <button class="translate-btn" onclick="toggleTranslation('p2-tr-1')">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box" id="p2-tr-1">Trên toàn cầu, quá trình đô thị hóa các cảnh quan đang gia tăng với tốc độ chưa từng thấy. Các chuyên gia cho rằng một phần lớn diện tích bề mặt đất dự kiến trở thành đô thị vào năm 2030 vẫn chưa được xây dựng. Việc sự mở rộng nhanh chóng này sẽ tác động thế nào đến sự đa dạng sinh học sẽ chỉ rõ ràng khi nhìn lại quá khứ. Gần đây, các nhà nghiên cứu đã tiết lộ, dựa trên dữ liệu lịch sử, cảnh quan đô thị đã thay đổi như thế nào qua ba thế kỷ tăng trưởng, đưa ra một dự báo ảm đạm cho tương lai của di sản tự nhiên của chúng ta.</div>
+            </div>
+
+            <div class="paragraph-block" id="p2-para-2">
+                <p class="paragraph-text">The study demonstrated that while the absolute number of species in certain regions has risen, the evolutionary (2) __________ of plants has declined. Native species from a wide range of plant families have died out regionally and been replaced by more closely related, non-native species. Overall, billions of years of evolutionary history have been lost, representing a severe (3) __________ to the long-term stability of ecosystems. This loss is primarily driven by the disappearance of specialists that depend on cool, nutrient-poor environments, which are increasingly paved over by concrete.</p>
+                <button class="translate-btn" onclick="toggleTranslation('p2-tr-2')">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box" id="p2-tr-2">Nghiên cứu chứng minh rằng mặc dù số lượng loài tuyệt đối ở một số khu vực nhất định đã tăng lên, nhưng kho lưu trữ/quỹ tiến hóa của thực vật lại giảm xuống. Các loài bản địa từ nhiều họ thực vật khác nhau đã tuyệt chủng cục bộ và bị thay thế bằng các loài ngoại lai có mối quan hệ họ hàng gần gũi hơn. Nhìn chung, hàng tỷ năm lịch sử tiến hóa đã bị mất đi, thể hiện một cú giáng mạnh vào sự ổn định lâu dài của các hệ sinh thái. Sự mất mát này chủ yếu do sự biến mất của các loài chuyên biệt sống phụ thuộc vào môi trường mát mẻ, nghèo dinh dưỡng, những nơi ngày càng bị bê tông hóa.</div>
+            </div>
+
+            <div class="paragraph-block" id="p2-para-3">
+                <p class="paragraph-text">The evolutionary diversity of plants is considered an important (4) __________ for environmental health. It stimulates the diversity of other organisms and can increase biomass production. As cities continue to expand, scientists are appealing for the precautionary protection of biological diversity. They argue that without urgent human (5) __________, the natural heritage of these regions will continue to erode. To ensure that future cities remain livable, planners must prioritize the protection of native habitats, ensuring that urban growth does not come at the expense of the complex biological systems that support all life.</p>
+                <button class="translate-btn" onclick="toggleTranslation('p2-tr-3')">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box" id="p2-tr-3">Sự đa dạng tiến hóa của thực vật được coi là một vùng đệm/tấm nệm bảo vệ quan trọng cho sức khỏe môi trường. Nó kích thích sự đa dạng của các sinh vật khác và có thể làm tăng sản lượng sinh khối. Khi các thành phố tiếp tục mở rộng, các nhà khoa học đang kêu gọi bảo vệ phòng ngừa sự đa dạng sinh học. Họ lập luận rằng nếu không có sự can thiệp khẩn cấp của con người, di sản tự nhiên của các vùng này sẽ tiếp tục bị xói mòn. Để đảm bảo các thành phố tương lai vẫn đáng sống, các nhà quy hoạch phải ưu tiên bảo vệ môi trường sống bản địa, đảm bảo rằng sự phát triển đô thị không phải trả giá bằng các hệ thống sinh học phức tạp hỗ trợ mọi sự sống.</div>
+            </div>
+
+            <div class="glossary-wrapper">
+                <div class="glossary-title">📊 GLOSSARY (BẢNG TRÍCH XUẤT TỪ VỰNG NÂNG CAO - CLOZE 2)</div>
+                <table class="glossary-table">
+                    <thead>
+                        <tr>
+                            <th>Từ vựng</th>
+                            <th>Từ loại</th>
+                            <th>Nghĩa tiếng Việt</th>
+                            <th>Cặp từ đồng nghĩa (Trong bài &lt;=&gt; Câu hỏi)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Urban landscape</td><td>n</td><td>Cảnh quan đô thị</td><td>Landscapes / land surface setup</td></tr>
+                        <tr><td>Pool</td><td>n</td><td>Kho lưu trữ, quỹ tích lũy chung</td><td>Evolutionary stock / genetic reservoir</td></tr>
+                        <tr><td>Blow</td><td>n</td><td>Cú giáng mạnh, tác động tiêu cực</td><td>Severe punch / traumatic shock</td></tr>
+                        <tr><td>Cushion</td><td>n</td><td>Vùng đệm bảo vệ, giảm xung chấn</td><td>Protection layer / supportive buffer</td></tr>
+                        <tr><td>Intervention</td><td>n</td><td>Sự can thiệp mang tính giải pháp</td><td>Human intrusion / controlled involvement</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel-right">
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 6:</strong> Choose the best option for blank (1):</div>
+                <button class="option-btn" onclick="checkMCQ(6, 'A', 'D')">A. city council</button>
+                <button class="option-btn" onclick="checkMCQ(6, 'B', 'D')">B. mass transit</button>
+                <button class="option-btn" onclick="checkMCQ(6, 'C', 'D')">C. public infrastructure</button>
+                <button class="option-btn" onclick="checkMCQ(6, 'D', 'D')">D. urban landscape</button>
+                <div class="explain-box" id="ex-box-6"></div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 7:</strong> Choose the best option for blank (2):</div>
+                <button class="option-btn" onclick="checkMCQ(7, 'A', 'B')">A. stock</button>
+                <button class="option-btn" onclick="checkMCQ(7, 'B', 'B')">B. pool</button>
+                <button class="option-btn" onclick="checkMCQ(7, 'C', 'B')">C. bank</button>
+                <button class="option-btn" onclick="checkMCQ(7, 'D', 'B')">D. store</button>
+                <div class="explain-box" id="ex-box-7"></div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 8:</strong> Choose the best option for blank (3):</div>
+                <button class="option-btn" onclick="checkMCQ(8, 'A', 'A')">A. blow</button>
+                <button class="option-btn" onclick="checkMCQ(8, 'B', 'A')">B. punch</button>
+                <button class="option-btn" onclick="checkMCQ(8, 'C', 'A')">C. hit</button>
+                <button class="option-btn" onclick="checkMCQ(8, 'D', 'A')">D. shock</button>
+                <div class="explain-box" id="ex-box-8"></div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 9:</strong> Choose the best option for blank (4):</div>
+                <button class="option-btn" onclick="checkMCQ(9, 'A', 'A')">A. cushion</button>
+                <button class="option-btn" onclick="checkMCQ(9, 'B', 'A')">B. pillow</button>
+                <button class="option-btn" onclick="checkMCQ(9, 'C', 'A')">C. bed</button>
+                <button class="option-btn" onclick="checkMCQ(9, 'D', 'A')">D. blanket</button>
+                <div class="explain-box" id="ex-box-9"></div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 10:</strong> Choose the best option for blank (5):</div>
+                <button class="option-btn" onclick="checkMCQ(10, 'A', 'C')">A. intrusion</button>
+                <button class="option-btn" onclick="checkMCQ(10, 'B', 'C')">B. interference</button>
+                <button class="option-btn" onclick="checkMCQ(10, 'C', 'C')">C. intervention</button>
+                <button class="option-btn" onclick="checkMCQ(10, 'D', 'C')">D. interruption</button>
+                <div class="explain-box" id="ex-box-10"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="workspace" id="tab-pane-3">
+        <div class="panel-left" id="p3-left-scroll">
+            <div class="passage-title">Global Urbanization Trends and UN Datasets</div>
+            
+            <div class="paragraph-block" id="p3-para-1">
+                <p class="paragraph-text">Currently, over half of the global populace resides in metropolitan regions, a figure projected to climb to 68% by the mid-21st century. Forecasts indicate that urbanization—defined as the progressive migration from countryside to city—coupled with general population expansion, could bolster urban numbers by an additional 2.5 billion by 2050. Notably, an overwhelming 90% of this surge is anticipated to occur within Asia and Africa, as per a recently released United Nations dataset.</p>
+                <button class="translate-btn" onclick="toggleTranslation('p3-tr-1')">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box" id="p3-tr-1">Hiện tại, hơn một nửa dân số toàn cầu cư trú tại các vùng đô thị, một con số dự kiến sẽ tăng lên 68% vào giữa thế kỷ 21. Các dự báo chỉ ra rằng quá trình đô thị hóa—được định nghĩa là sự di cư lũy tiến từ nông thôn ra thành phố—kết hợp với sự gia tăng dân số nói chung, có thể làm tăng số lượng cư dân đô thị thêm 2,5 tỷ người vào năm 2050. Đáng chú ý, 90% lượng tăng vọt này dự kiến sẽ diễn ra tại châu Á và châu Phi, theo một tập dữ liệu mới công bố của Liên Hợp Quốc.</div>
+            </div>
+
+            <div class="paragraph-block" id="p3-para-2">
+                <p class="paragraph-text">Prospective growth in the global urban demographic is set to be intensely clustered within a select group of nations. Collectively, India, China, and Nigeria are estimated to represent 35% of the anticipated urban expansion between 2018 and 2050. By 2050, India is foreseen to incorporate 416 million city residents, while China and Nigeria are expected to see increments of 255 million and 189 million, respectively.</p>
+                <button class="translate-btn" onclick="toggleTranslation('p3-tr-2')">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box" id="p3-tr-2">Sự tăng trưởng tương lai trong nhân khẩu học đô thị toàn cầu được thiết lập tập trung mạnh mẽ vào một nhóm quốc gia được chọn lọc. Tính tổng lại, Ấn Độ, Trung Quốc và Nigeria ước tính chiếm 35% lượng mở rộng đô thị dự kiến từ năm 2018 đến 2050. Đến năm 2050, Ấn Độ được dự báo sẽ có thêm 416 triệu cư dân thành phố, trong khi Trung Quốc và Nigeria dự kiến sẽ chứng kiến mức tăng lần lượt là 255 triệu và 189 triệu người.</div>
+            </div>
+
+            <div class="paragraph-block" id="p3-para-3">
+                <p class="paragraph-text">At present, the most heavily urbanized territories comprise Northern America (with 82% of its inhabitants in urban centers as of 2018), Latin America and the Caribbean (81%), Europe (74%), and Oceania (68%). The urbanization rate in Asia is currently approaching the 50% threshold. Conversely, Africa remains predominantly agrarian, with only 43% of its populace situated in urban environments.</p>
+                <button class="translate-btn" onclick="toggleTranslation('p3-tr-3')">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box" id="p3-tr-3">Hiện nay, các lãnh thổ đô thị hóa mạnh nhất bao gồm Bắc Mỹ (với 82% cư dân sống ở các trung tâm đô thị tính đến năm 2018), Mỹ Latinh và vùng Caribe (81%), châu Âu (74%), và châu Đại Dương (68%). Tỷ lệ đô thị hóa ở châu Á hiện đang tiến gần đến ngưỡng 50%. Ngược lại, châu Phi vẫn chủ yếu là nông nghiệp, với chỉ 43% dân số sinh sống trong môi trường đô thị.</div>
+            </div>
+
+            <div class="paragraph-block" id="p3-para-4">
+                <p class="paragraph-text">Sustainable urbanization is key to successful development. As the world continues to urbanize, sustainable development depends increasingly on the successful management of urban growth, especially in low-income and lower-middle-income countries where the pace of urbanization is projected to be the fastest. Many countries will face challenges in meeting the needs of <strong>their</strong> growing urban populations, including for housing, transportation, energy systems and other infrastructure, as well as for employment and basic services such as education and health care.</p>
+                <button class="translate-btn" onclick="toggleTranslation('p3-tr-4')">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box" id="p3-tr-4">Đô thị hóa bền vững là chìa khóa cho sự phát triển thành công. Khi thế giới tiếp tục đô thị hóa, phát triển bền vững phụ thuộc ngày càng nhiều vào việc quản lý thành công sự tăng trưởng đô thị, đặc biệt là ở các nước có thu nhập thấp và thu nhập trung bình thấp, nơi tốc độ đô thị hóa được dự báo là nhanh nhất. Nhiều quốc gia sẽ đối mặt với những thách thức trong việc đáp ứng nhu cầu của các nhóm dân cư đô thị đang tăng trưởng của họ, bao gồm nhà ở, giao thông, hệ thống năng lượng và cơ sở hạ tầng khác, cũng như việc làm và các dịch vụ cơ bản như giáo dục và chăm sóc sức khỏe.</div>
+            </div>
+
+            <div class="paragraph-block" id="p3-para-5">
+                <p class="paragraph-text">To ensure that the benefits of urbanization are fully shared and inclusive, policies to manage urban growth need to ensure access to infrastructure and social services for all, focusing on the needs of the urban poor and other vulnerable groups for housing, education, health care, decent work and a safe environment.</p>
+                <button class="translate-btn" onclick="toggleTranslation('p3-tr-5')">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box" id="p3-tr-5">Để đảm bảo các lợi ích của đô thị hóa được chia sẻ đầy đủ và mang tính bao trùm, các chính sách quản lý tăng trưởng đô thị cần đảm bảo quyền tiếp cận cơ sở hạ tầng và dịch vụ xã hội cho tất cả mọi người, tập trung vào nhu cầu của người nghèo đô thị và các nhóm dễ bị tổn thương khác về nhà ở, giáo dục, chăm sóc sức khỏe, việc làm tử tế và môi trường an toàn.</div>
+            </div>
+
+            <div class="glossary-wrapper">
+                <div class="glossary-title">📊 GLOSSARY (BẢNG TRÍCH XUẤT TỪ VỰNG NÂNG CAO - READING 1)</div>
+                <table class="glossary-table">
+                    <thead>
+                        <tr>
+                            <th>Từ vựng</th>
+                            <th>Từ loại</th>
+                            <th>Nghĩa tiếng Việt</th>
+                            <th>Từ đồng nghĩa tương đương trong đề bài</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Agrarian</td><td>adj</td><td>Thuộc nông nghiệp, đồng ruộng</td><td>Rural-based / agricultural structure</td></tr>
+                        <tr><td>Inclusive</td><td>adj</td><td>Bao trùm, bình đẳng cho mọi tầng lớp</td><td>Equitable / universally shared</td></tr>
+                        <tr><td>Burgeoning</td><td>adj</td><td>Đang phát triển bùng nổ, tăng nhanh</td><td>Growing urban populations</td></tr>
+                        <tr><td>Vulnerable</td><td>adj</td><td>Dễ bị tổn thương, nhóm yếu thế</td><td>The urban poor / marginalized group</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel-right">
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 11:</strong> The word “their” in paragraph 4 refers to _______</div>
+                <button class="option-btn" onclick="checkMCQ(11, 'A', 'A')">A. many countries</button>
+                <button class="option-btn" onclick="checkMCQ(11, 'B', 'A')">B. challenges</button>
+                <button class="option-btn" onclick="checkMCQ(11, 'C', 'A')">C. needs</button>
+                <button class="option-btn" onclick="checkMCQ(11, 'D', 'A')">D. urban populations</button>
+                <div class="explain-box" id="ex-box-11"></div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 12:</strong> What can be inferred about Africa from paragraph 3?</div>
+                <button class="option-btn" onclick="checkMCQ(12, 'A', 'B')">A. It has achieved the zenith of its metropolitan expansion.</button>
+                <button class="option-btn" onclick="checkMCQ(12, 'B', 'B')">B. Rural-based lifestyles still constitute the majority of its social fabric.</button>
+                <button class="option-btn" onclick="checkMCQ(12, 'C', 'B')">C. It lacks the foundational public infrastructure for any urban life.</button>
+                <button class="option-btn" onclick="checkMCQ(12, 'D', 'B')">D. The momentum of its urbanization has reached a plateau.</button>
+                <div class="explain-box" id="ex-box-12"></div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 13:</strong> According to paragraph 4, which of the following is NOT mentioned as a challenge?</div>
+                <button class="option-btn" onclick="checkMCQ(13, 'A', 'A')">A. Regulatory frameworks for food exportation</button>
+                <button class="option-btn" onclick="checkMCQ(13, 'B', 'A')">B. Multimodal transportation networks</button>
+                <button class="option-btn" onclick="checkMCQ(13, 'C', 'A')">C. Provision of health care services</button>
+                <button class="option-btn" onclick="checkMCQ(13, 'D', 'A')">D. Residential and housing requirements</button>
+                <div class="explain-box" id="ex-box-13"></div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 14:</strong> Which of the following is the main idea of paragraph 5?</div>
+                <button class="option-btn" onclick="checkMCQ(14, 'A', 'B')">A. Engineering high-end, exclusive energy systems</button>
+                <button class="option-btn" onclick="checkMCQ(14, 'B', 'B')">B. Cultivating an equitable and inclusive urban framework</button>
+                <button class="option-btn" onclick="checkMCQ(14, 'C', 'B')">C. Implementing drastic measures to curb urbanization rates</button>
+                <button class="option-btn" onclick="checkMCQ(14, 'D', 'B')">D. Prioritizing the overhaul of rural public infrastructure</button>
+                <div class="explain-box" id="ex-box-14"></div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 15:</strong> Which policy would the author most likely advocate for?</div>
+                <button class="option-btn" onclick="checkMCQ(15, 'A', 'B')">A. Spontaneous urban development</button>
+                <button class="option-btn" onclick="checkMCQ(15, 'B', 'B')">B. Equitable and strategic distribution of social services</button>
+                <button class="option-btn" onclick="checkMCQ(15, 'C', 'B')">C. Unregulated industrialization to prioritize economic output</button>
+                <button class="option-btn" onclick="checkMCQ(15, 'D', 'B')">D. Forced de-urbanization to balance the global population</button>
+                <div class="explain-box" id="ex-box-15"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="workspace" id="tab-pane-4">
+        <div class="panel-left" id="p4-left-scroll">
+            <div class="passage-title">The Mechanics of Urban Heat Islands (UHI)</div>
+            
+            <div class="paragraph-block" id="p4-para-1">
+                <p class="paragraph-text">An Urban Heat Island (UHI) denotes a metropolitan district that exhibits significantly higher temperatures than its surrounding rural hinterlands. This thermal disparity is primarily catalyzed by the anthropogenic energy dissipated by dense populations and extensive transportation networks in global hubs such as New York, Paris, and London. Essentially, UHIs manifest in regions characterized by intense human activity and high population density.</p>
+                <button class="translate-btn" onclick="toggleTranslation('p4-tr-1')">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box" id="p4-tr-1">Đảo nhiệt đô thị (UHI) biểu thị một khu vực đô thị có nhiệt độ cao hơn đáng kể so với các vùng nông thôn xung quanh. Sự chênh lệch nhiệt độ này chủ yếu được xúc tác bởi năng lượng do con người tạo ra, tỏa ra từ mật độ dân cư đông đúc và các mạng lưới giao thông rộng lớn ở các trung tâm toàn cầu như New York, Paris và London. Về cơ bản, hiện tượng đảo nhiệt đô thị biểu hiện rõ rệt ở các vùng đặc trưng bởi hoạt động mạnh mẽ của con người và mật độ dân số cao.</div>
+            </div>
+
+            <div class="paragraph-block" id="p4-para-2">
+                <p class="paragraph-text">The etiology of UHIs is multifaceted. The dense clustering of residential, commercial, and industrial structures plays a pivotal role, as conventional building materials possess high thermal mass, effectively sequestering heat. This insulation inevitably elevates the ambient temperature of the microclimate. Furthermore, “waste heat” serves as a major contributor. Human metabolism and mechanical operations—ranging from industrial manufacturing to daily commuting—release vast quantities of energy, predominantly in the form of heat. In densely populated urban centers, the cumulative effect of this thermal emission is profound.</p>
+                <button class="translate-btn" onclick="toggleTranslation('p4-tr-2')">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box" id="p4-tr-2">Nguyên nhân của hiện tượng đảo nhiệt đô thị là đa diện. Sự tập trung dày đặc của các cấu trúc nhà ở, thương mại và công nghiệp đóng vai trò then chốt, vì các vật liệu xây dựng thông thường sở hữu khối lượng nhiệt lớn, giữ nhiệt hiệu quả. Lớp cách nhiệt này chắc chắn làm tăng nhiệt độ xung quanh của khí hậu vi mô. Hơn nữa, "nhiệt thải" đóng vai trò là một tác nhân đóng góp lớn. Sự trao đổi chất của con người và các hoạt động cơ học—từ sản xuất công nghiệp đến việc đi lại hàng ngày—giải phóng một lượng lớn năng lượng, chủ yếu dưới dạng nhiệt. Tại các trung tâm đô thị đông đúc, tác động tích tụ của sự phát thải nhiệt này là cực kỳ sâu sắc.</div>
+            </div>
+
+            <div class="paragraph-block" id="p4-para-3">
+                <p class="paragraph-text">Beyond temperature elevation, UHIs exert a deleterious influence on atmospheric and aquatic quality. <strong>These areas</strong> often suffer from diminished air quality due to the concentrated discharge of pollutants from vehicular and industrial sources. Similarly, water quality is compromised when elevated runoff from the UHI is discharged into local streams, inducing thermal stress on indigenous species that have evolutionarily adapted to cooler environments.</p>
+                <button class="translate-btn" onclick="toggleTranslation('p4-tr-3')">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box" id="p4-tr-3">Bên cạnh việc làm tăng nhiệt độ, đảo nhiệt đô thị còn gây ảnh hưởng tai hại đến chất lượng khí quyển và nguồn nước. Những khu vực này thường phải chịu chất lượng không khí suy giảm do lượng khí thải tập trung từ các nguồn phương tiện giao thông và công nghiệp. Tương tự, chất lượng nước bị tổn hại khi dòng chảy dâng cao từ đảo nhiệt xả vào các dòng suối địa phương, gây ra áp lực nhiệt đối với các loài bản địa vốn đã thích nghi tiến hóa với môi trường mát mẻ hơn.</div>
+            </div>
+
+            <div class="paragraph-block" id="p4-para-4">
+                <p class="paragraph-text">Given these adverse ramifications, environmental scientists emphasize the necessity for architects and urban planners to mitigate human impact through sustainable design. The implementation of “green roofs”—vegetated building envelopes—facilitates cooling by absorbing carbon dioxide and providing shade. Additionally, the adoption of high-albedo (light-colored) materials is crucial, as these surfaces reflect a greater proportion of solar radiation, thereby minimizing heat entrapment within the urban fabric.</p>
+                <button class="translate-btn" onclick="toggleTranslation('p4-tr-4')">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box" id="p4-tr-4">Trước những hệ lụy tiêu cực này, các nhà khoa học môi trường nhấn mạnh sự cần thiết của các kiến trúc sư và nhà quy hoạch đô thị trong việc giảm thiểu tác động của con người thông qua thiết kế bền vững. Việc triển khai "mái nhà xanh"—lớp phủ thực vật cho tòa nhà—giúp làm mát bằng cách hấp thụ khí carbon dioxide và tạo bóng râm. Ngoài ra, việc áp dụng các vật liệu có độ phản xạ cao (màu sáng) là rất quan trọng, vì các bề mặt này phản xạ tỷ lệ bức xạ mặt trời lớn hơn, từ đó giảm thiểu sự bẫy nhiệt trong lòng đô thị.</div>
+            </div>
+
+            <div class="glossary-wrapper">
+                <div class="glossary-title">📊 GLOSSARY (BẢNG TRÍCH XUẤT TỪ VỰNG NÂNG CAO - READING 2)</div>
+                <table class="glossary-table">
+                    <thead>
+                        <tr>
+                            <th>Từ vựng</th>
+                            <th>Từ loại</th>
+                            <th>Nghĩa tiếng Việt</th>
+                            <th>Cặp từ đồng nghĩa (Trong bài &lt;=&gt; Câu hỏi)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Anthropogenic</td><td>adj</td><td>Do con người tác động tạo ra</td><td>Human-caused / induced factors</td></tr>
+                        <tr><td>Deleterious</td><td>adj</td><td>Có hại, mang tính hủy hoại</td><td>Harmful / dual degradation</td></tr>
+                        <tr><td>Sequester</td><td>v</td><td>Cô lập, giữ lại, bẫy giữ nhiệt</td><td>Trap / lock away heat mass</td></tr>
+                        <tr><td>High-albedo</td><td>adj</td><td>Có độ phản xạ bức xạ cao</td><td>Light-colored surfaces</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel-right">
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 16:</strong> The word “these areas” in paragraph 3 refers to ______</div>
+                <button class="option-btn" onclick="checkMCQ(16, 'A', 'C')">A. global transportation networks</button>
+                <button class="option-btn" onclick="checkMCQ(16, 'B', 'C')">B. indigenous aquatic species</button>
+                <button class="option-btn" onclick="checkMCQ(16, 'C', 'C')">C. urban heat islands</button>
+                <button class="option-btn" onclick="checkMCQ(16, 'D', 'C')">D. surrounding rural hinterlands</button>
+                <div class="explain-box" id="ex-box-16"></div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 17:</strong> What can be inferred about “waste heat” from paragraph 2?</div>
+                <button class="option-btn" onclick="checkMCQ(17, 'A', 'B')">A. It originates exclusively from industrial manufacturing processes</button>
+                <button class="option-btn" onclick="checkMCQ(17, 'B', 'B')">B. It represents an inherent and inevitable byproduct of human existence.</button>
+                <button class="option-btn" onclick="checkMCQ(17, 'C', 'B')">C. It can be systematically eradicated through strategic urban planning.</button>
+                <button class="option-btn" onclick="checkMCQ(17, 'D', 'B')">D. It is primarily sequestered within building materials with high thermal mass.</button>
+                <div class="explain-box" id="ex-box-17"></div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 18:</strong> Which of the following best paraphrases this sentence: “The implementation of ‘green roofs’—vegetated building envelopes—facilitates cooling by absorbing carbon dioxide and providing shade.”</div>
+                <button class="option-btn" onclick="checkMCQ(18, 'A', 'A')">A. Covering structural exteriors with flora serves as a thermal mitigation strategy through carbon sequestration and the provision of solar protection.</button>
+                <button class="option-btn" onclick="checkMCQ(18, 'B', 'A')">B. Green roofs are primarily designed to enhance the aesthetic appeal of metropolitan districts while trapping greenhouse gases within the urban fabric.</button>
+                <button class="option-btn" onclick="checkMCQ(18, 'C', 'A')">C. Architects should prioritize the use of artificial shade structures over natural vegetation to ensure the long-term cooling of industrial buildings.</button>
+                <button class="option-btn" onclick="checkMCQ(18, 'D', 'A')">D. The accumulation of carbon dioxide on building surfaces is the fundamental cause of heat entrapment, necessitating the removal of all vegetated envelopes.</button>
+                <div class="explain-box" id="ex-box-18"></div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 19:</strong> Which of the following best summarizes paragraph 3?</div>
+                <button class="option-btn" onclick="checkMCQ(19, 'A', 'A')">A. The dual degradation of atmospheric and aquatic environments in UHIs.</button>
+                <button class="option-btn" onclick="checkMCQ(19, 'B', 'A')">B. The evolutionary adaptation of indigenous species to warmer runoff.</button>
+                <button class="option-btn" onclick="checkMCQ(19, 'C', 'A')">C. The primary role of vehicular discharge in elevating terrestrial temperatures.</button>
+                <button class="option-btn" onclick="checkMCQ(19, 'D', 'A')">D. The demographic contrast between metropolitan districts and rural areas.</button>
+                <div class="explain-box" id="ex-box-19"></div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 20:</strong> What strategy would the author most likely advocate for?</div>
+                <button class="option-btn" onclick="checkMCQ(20, 'A', 'C')">A. Expanding the use of high-thermal-mass materials for residential insulation.</button>
+                <button class="option-btn" onclick="checkMCQ(20, 'B', 'C')">B. Maximizing the structural density of commercial and industrial clusters.</button>
+                <button class="option-btn" onclick="checkMCQ(20, 'C', 'C')">C. Incorporating cooling-oriented architectural and design interventions.</button>
+                <button class="option-btn" onclick="checkMCQ(20, 'D', 'C')">D. Enforcing strict regulations to inhibit the physical mobility of city dwellers.</button>
+                <div class="explain-box" id="ex-box-20"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="workspace" id="tab-pane-5">
+        <div class="panel-left" id="p5-left-scroll">
+            <div class="passage-title">Egalitarian Resources and Spatial Frameworks</div>
+            
+            <div class="paragraph-block" id="p5-para-1">
+                <p class="paragraph-text">Currently, more than a moiety of the global populace resides within metropolitan jurisdictions, a proportion projected to escalate to 68% by the mid-21st century. Empirical forecasts indicate that urbanization—defined as the progressive demographic transition from agrarian hinterlands to urban centers—intertwined with aggregate population expansion, could augment urban numbers by an additional 2.5 billion by 2050. Notably, an overwhelming influx of this demographic surge is anticipated to materialize within Asia and Africa, according to a recently disseminated United Nations dataset. Prospective growth in the global urban demographic is set to be intensely clustered within a select cohort of nations, specifically India, China, and Nigeria.</p>
+                <button class="translate-btn" onclick="toggleTranslation('p5-tr-1')">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box" id="p5-tr-1">Hiện tại, hơn một nửa dân số toàn cầu sinh sống trong các khu vực tài phán đô thị, một tỷ lệ dự kiến sẽ tăng lên 68% vào giữa thế kỷ 21. Các dự báo thực nghiệm chỉ ra rằng quá trình đô thị hóa—được định nghĩa là sự chuyển đổi nhân khẩu học tiến bộ từ các vùng nội địa nông nghiệp sang các trung tâm đô thị—đan xen với sự mở rộng tổng thể dân số, có thể làm tăng số lượng cư dân đô thị thêm 2,5 tỷ người vào năm 2050. Đáng chú ý, một luồng tăng vọt nhân khẩu học khổng lồ này dự kiến sẽ hiện thực hóa tại châu Á và châu Phi, theo một tập dữ liệu của Liên Hợp Quốc mới được phổ biến gần đây. Sự tăng trưởng tiềm năng trong nhân khẩu học đô thị toàn cầu được thiết lập tập trung mạnh mẽ vào một nhóm quốc gia được chọn lọc, cụ thể là Ấn Độ, Trung Quốc và Nigeria.</div>
+            </div>
+
+            <div class="paragraph-block" id="p5-para-2">
+                <p class="paragraph-text">Sustainable urbanization constitutes the linchpin of efficacious development. As the global landscape continues to urbanize, the viability of sustainable development hinges increasingly upon the proficient management of urban expansion, particularly in low-income and lower-middle-income sovereign states where the velocity of metropolitan growth is projected to be most acute. <strong>Myriad nations</strong> will encounter formidable impediments in facilitating the requirements of their burgeoning urban populations, encompassing residential provisions, multimodal transportation networks, sophisticated energy matrices, and other critical infrastructure, alongside gainful employment and fundamental services such as pedagogical institutions and clinical healthcare.</p>
+                <button class="translate-btn" onclick="toggleTranslation('p5-tr-2')">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box" id="p5-tr-2">Đô thị hóa bền vững cấu thành cốt lõi của sự phát triển hiệu quả. Khi bối cảnh toàn cầu tiếp tục đô thị hóa, khả năng tồn tại của phát triển bền vững phụ thuộc ngày càng nhiều vào việc quản lý thành thạo sự mở rộng đô thị, đặc biệt là ở các quốc gia có chủ quyền có thu nhập thấp và thu nhập trung bình thấp, nơi tốc độ tăng trưởng đô thị được dự báo là gay gắt nhất. Vô số quốc gia sẽ gặp phải những trở ngại ghê gớm trong việc đáp ứng các yêu cầu của dân số đô thị đang bùng nổ của họ, bao gồm nhà ở, mạng lưới giao thông đa phương thức, ma trận năng lượng tinh vi và cơ sở hạ tầng quan trọng khác, cùng với việc làm có thu nhập và các dịch vụ cơ bản như các cơ sở sư phạm và chăm sóc sức khỏe lâm sàng.</div>
+            </div>
+
+            <div class="paragraph-block" id="p5-para-3">
+                <p class="paragraph-text">To ensure that the dividends of urbanization are equitably dispersed and inclusive, governance frameworks must guarantee universal access to physical infrastructure and social safety nets, prioritizing the exigencies of the urban indigent and other marginalized cohorts. This necessitates a comprehensive strategic recalibration of extant urban planning paradigms to prioritize the egalitarian distribution of resources. Ultimately, the objective is to harness the latent economic potency of these urban hubs to secure long-term resilience while mitigating the environmental degradation and ecological fragmentation frequently precipitated by rapid metropolitan sprawl.</p>
+                <button class="translate-btn" onclick="toggleTranslation('p5-tr-3')">Mở dịch đoạn này 🌟</button>
+                <div class="translation-box" id="p5-tr-3">Để đảm bảo thành quả của đô thị hóa được phân tán một cách công bằng và mang tính bao trùm, các khung quản trị phải đảm bảo quyền tiếp cận phổ quát đối với cơ sở hạ tầng vật chất và mạng lưới an sinh xã hội, ưu tiên các nhu cầu cấp bách của những người nghèo khổ ở đô thị và các nhóm bị gạt ra ngoài lề xã hội khác. Điều này đòi hỏi một sự tái cân bằng chiến lược toàn diện của các mô hình quy hoạch đô thị hiện tại để ưu tiên phân phối tài nguyên theo chủ nghĩa bình đẳng. Cuối cùng, mục tiêu là khai thác tiềm năng kinh tế tiềm ẩn của các trung tâm đô thị này để đảm bảo khả năng phục hồi lâu dài trong khi giảm thiểu sự suy thoái môi trường và phân mảnh sinh thái thường do sự mở rộng đô thị nhanh chóng gây ra.</div>
+            </div>
+
+            <div class="glossary-wrapper">
+                <div class="glossary-title">📊 GLOSSARY (BẢNG TRÍCH XUẤT TỪ VỰNG NÂNG CAO - READING 3)</div>
+                <table class="glossary-table">
+                    <thead>
+                        <tr>
+                            <th>Từ vựng</th>
+                            <th>Từ loại</th>
+                            <th>Nghĩa tiếng Việt</th>
+                            <th>Từ đồng nghĩa tương đương trong bài học</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Moiety</td><td>n</td><td>Một nửa, một phần phân chia</td><td>Half of the populace / portion</td></tr>
+                        <tr><td>Linchpin</td><td>n</td><td>Yếu tố cốt lõi, chốt giữ quan trọng</td><td>Key component / fundamental driver</td></tr>
+                        <tr><td>Egalitarian</td><td>adj</td><td>Bình đẳng, chủ nghĩa cào bằng xã hội</td><td>Equitable and inclusive setup</td></tr>
+                        <tr><td>Indigent</td><td>n/adj</td><td>Người nghèo đói, khốn khó</td><td>The urban poor / vulnerable cohorts</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel-right">
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 21:</strong> The word “their” in paragraph 2 refers to _______</div>
+                <button class="option-btn" onclick="checkMCQ(21, 'A', 'A')">A. myriad nations</button>
+                <button class="option-btn" onclick="checkMCQ(21, 'B', 'A')">B. formidable impediments</button>
+                <button class="option-btn" onclick="checkMCQ(21, 'C', 'A')">C. burgeoning populations</button>
+                <button class="option-btn" onclick="checkMCQ(21, 'D', 'A')">D. pedagogical institutions</button>
+                <div class="explain-box" id="ex-box-21"></div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 22:</strong> What can be inferred regarding the geographical distribution of future urban growth from paragraph 1?</div>
+                <button class="option-btn" onclick="checkMCQ(22, 'A', 'B')">A. Metropolitan expansion will be characterized by geographical uniformity across all continents.</button>
+                <button class="option-btn" onclick="checkMCQ(22, 'B', 'B')">B. The preponderance of the projected urban increment will be localized within specific emerging economies.</button>
+                <button class="option-btn" onclick="checkMCQ(22, 'C', 'B')">C. The rural-to-urban migration trajectory has reached its saturation point in most industrialized nations.</button>
+                <button class="option-btn" onclick="checkMCQ(22, 'D', 'B')">D. High-income sovereign states will spearhead the global demographic expansion by the year 2050.</button>
+                <div class="explain-box" id="ex-box-22"></div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 23:</strong> Which of the following best paraphrases this sentence: “To ensure that the dividends of urbanization are equitably dispersed and inclusive, governance frameworks must guarantee universal access to physical infrastructure and social safety nets, prioritizing the exigencies of the urban indigent and other marginalized cohorts.”</div>
+                <button class="option-btn" onclick="checkMCQ(23, 'A', 'B')">A. Urban planners should prioritize the construction of high-end facilities to attract wealthy investors to metropolitan hubs.</button>
+                <button class="option-btn" onclick="checkMCQ(23, 'B', 'B')">B. Successful urban expansion requires a model where essential resources and safety nets are accessible to everyone, particularly the underprivileged.</button>
+                <button class="option-btn" onclick="checkMCQ(23, 'C', 'B')">C. Global organizations must reduce the rate of city growth to prevent the depletion of social services in developing nations.</button>
+                <button class="option-btn" onclick="checkMCQ(23, 'D', 'B')">D. Infrastructure development is the sole responsibility of the private sector, regardless of the needs of vulnerable citizens.</button>
+                <div class="explain-box" id="ex-box-23"></div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 24:</strong> What can be inferred about urban planning from paragraph 3?</div>
+                <button class="option-btn" onclick="checkMCQ(24, 'A', 'B')">A. Engineering technologically advanced, exclusive energy matrices for affluent districts.</button>
+                <button class="option-btn" onclick="checkMCQ(24, 'B', 'B')">B. Fostering an equitable and inclusive urban governance framework for the entire citizenry.</button>
+                <button class="option-btn" onclick="checkMCQ(24, 'C', 'B')">C. Implementing stringent legislative measures to suppress the overall velocity of urbanization.</button>
+                <button class="option-btn" onclick="checkMCQ(24, 'D', 'B')">D. Prioritizing the revitalization of agrarian public infrastructure over metropolitan expansion.</button>
+                <div class="explain-box" id="ex-box-24"></div>
+            </div>
+
+            <div class="exercise-card">
+                <div class="question-header"><strong>Question 25:</strong> Which approach to urban governance is most likely advocated?</div>
+                <button class="option-btn" onclick="checkMCQ(25, 'A', 'B')">A. A laissez-faire model characterized by spontaneous and unregulated urban development.</button>
+                <button class="option-btn" onclick="checkMCQ(25, 'B', 'B')">B. A structured and strategic allocation of infrastructure and vital social services.</button>
+                <button class="option-btn" onclick="checkMCQ(25, 'C', 'B')">C. Unrestricted industrialization focused solely on immediate macroeconomic throughput.</button>
+                <button class="option-btn" onclick="checkMCQ(25, 'D', 'B')">D. Mandatory de-urbanization strategies to rebalance the global demographic equilibrium.</button>
+                <div class="explain-box" id="ex-box-25"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-panel">
+        <button class="submit-all-btn" onclick="openReportModal()">NỘP BÀI XEM ĐIỂM SỐ</button>
+    </div>
+
+    <div class="modal-overlay" id="score-modal">
+        <div class="modal-content">
+            <div style="font-size: 38pt;">🏆</div>
+            <div style="font-weight: 900; font-size: 15pt; color: #2C3E50;">KẾT QUẢ BÀI KIỂM TRA</div>
+            <div class="modal-score-lbl" id="final-score-lbl">0 / 25</div>
+            <div class="modal-comment-lbl" id="final-comment-lbl">Lời nhận xét học thuật đang được tạo lập...</div>
+            <button class="modal-close-btn" onclick="closeModal()">ĐÓNG ĐỂ XEM LẠI DẪN CHỨNG</button>
+        </div>
+    </div>
+
+    <script>
+        // Bản ánh xạ cơ sở dữ liệu giải thích 4 bước sư phạm học thuật đỉnh cao phục vụ nút đồng bộ dẫn chứng Locate & Sync
+        const detailedExplanations = {
+            1: { ans: "B. vehicle", para: "p1-para-1", scroll: "p1-left-scroll", step2: "Câu hỏi yêu cầu tìm một danh từ chỉ phương tiện hoặc công cụ trung gian giúp Nhóm Ngân hàng Thế giới thực hiện lý tưởng xóa nghèo.", step3: "Từ 'vehicle' trong văn phong học thuật cao cấp có nghĩa là 'phương tiện truyền tải/công cụ thực hiện hữu hiệu'.", step4: "Loại A (môi trường sống), C (biên giới), D (nơi cư trú) vì sai hoàn toàn bản chất nghĩa." },
+            2: { ans: "A. gentrification", para: "p1-para-2", scroll: "p1-left-scroll", step2: "Vế sau chỉ rõ giá trị bất động sản tăng cao kéo theo sự di dời của người dân nghèo.", step3: "Đây là định nghĩa chuẩn xác của thuật ngữ 'gentrification' (sự chỉnh trang/cao cấp hóa đô thị).", step4: "Loại B, C, D vì chỉ là từ chung chung không lột tả được hiện tượng phân hóa giàu nghèo." },
+            3: { ans: "C. thirst", para: "p1-para-2", scroll: "p1-left-scroll", step2: "Quản lý sự khao khát/nhu cầu khổng lồ tăng vọt đối với cơ sở hạ tầng đô thị.", step3: "'Thirst for something' là một ẩn dụ colocation học thuật mạnh mẽ chỉ nhu cầu bức thiết tối cao.", step4: "Các phương án khác (tiêu hóa, đói bụng, thèm ăn) không đi kèm tạo colocation đúng nghĩa." },
+            4: { ans: "A. deficit", para: "p1-para-3", scroll: "p1-left-scroll", step2: "Giải quyết bài toán thâm hụt hoặc thiếu hụt nghiêm trọng của cơ sở hạ tầng hiện tại.", step3: "Cụm thuật ngữ kinh tế học kinh điển 'infrastructure deficit' chỉ sự thâm hụt/thiếu hụt vật chất hạ tầng.", step4: "Loại B, C, D vì không tạo thành thuật ngữ kinh tế học vĩ mô." },
+            5: { ans: "B. capital", para: "p1-para-3", scroll: "p1-left-scroll", step2: "Khai thác nguồn vốn tiềm ẩn hoặc nguồn lực nguồn lực (latent capital) của các trung tâm đầu mối.", step3: "Từ 'capital' đại diện cho toàn bộ giá trị nguồn lực tài chính hữu hình và tài nguyên vô hình.", step4: "Loại A (bất động sản), C và D vì mang nghĩa tiền của, kho báu đơn thuần." },
+            6: { ans: "D. urban landscape", para: "p2-para-1", scroll: "p2-left-scroll", step2: "Cảnh quan đô thị đã thay đổi biến đổi như thế nào qua ba thế kỷ tăng trưởng.", step3: "Sự phát triển của bề mặt đất đô thị tạo nên 'urban landscape' (cảnh quan đô thị).", step4: "Loại A, B, C lệch lạc ngữ cảnh không gian địa lý." },
+            7: { ans: "B. pool", para: "p2-para-2", scroll: "p2-left-scroll", step2: "Quỹ gen hoặc kho lưu trữ tiến hóa (evolutionary pool) của thực vật.", step3: "Cụm thuật ngữ sinh thái học 'evolutionary pool' chỉ tổng hòa kho tàng dữ liệu tiến hóa loài.", step4: "Do đó chọn B." },
+            8: { ans: "A. blow", para: "p2-para-2", scroll: "p2-left-scroll", step2: "Gây ra một cú giáng mạnh mẽ (severe blow to sth) vào sự ổn định của hệ sinh thái.", step3: "Thành ngữ 'deal a severe blow to something' có nghĩa là làm tổn hại nặng nề đến cái gì.", step4: "Do đó chọn A." },
+            9: { ans: "A. cushion", para: "p2-para-3", scroll: "p2-left-scroll", step2: "Sự đa dạng tiến hóa được xem như một tấm nệm giảm chấn, vùng đệm bảo vệ (cushion for environmental health).", step3: "Từ 'cushion' làm ẩn dụ bảo vệ rất tốt chống lại biến động.", step4: "Các từ khác mang nghĩa cái gối, cái giường không phù hợp." },
+            10: { ans: "C. intervention", para: "p2-para-3", scroll: "p2-left-scroll", step2: "Nếu không có sự can thiệp khẩn cấp kịp thời của con người (human intervention).", step3: "Từ này mang nghĩa can thiệp mang tính giải cứu chiến lược.", step4: "Loại A (xâm nhập trái phép), B (can thiệp quấy rối tiêu cực)." },
+            11: { ans: "A. many countries", para: "p3-para-4", scroll: "p3-left-scroll", step2: "Xét chủ ngữ của câu phía trước liền kề: 'Many countries will face challenges in meeting...'", step3: "Tính từ sở hữu 'their' thay thế trực tiếp cho danh từ số nhiều 'many countries' đứng trước.", step4: "Loại B, C, D vì không phù hợp logic quy chiếu." },
+            12: { ans: "B. Rural-based lifestyles still constitute the majority of its social fabric.", para: "p3-para-3", scroll: "p3-left-scroll", step2: "Đoạn văn ghi rõ: 'Conversely, Africa remains predominantly agrarian, with only 43% of its populace situated in urban environments.'", step3: "Châu Phi chủ yếu làm nông nghiệp (predominantly agrarian) và chỉ có 43% ở thành thị, suy ra 57% còn lại sống ở nông thôn.", step4: "Loại A, C, D vì bóp méo thông tin bài đọc." },
+            13: { ans: "A. Regulatory frameworks for food exportation", para: "p3-para-4", scroll: "p3-left-scroll", step2: "Đọc kỹ danh sách liệt kê các thách thức trong đoạn 4 gồm: housing, transportation, energy systems, employment, education, healthcare.", step3: "Vấn đề xuất khẩu lương thực ('food exportation') hoàn toàn không xuất hiện.", step4: "Do đó chọn câu A làm đáp án đúng cho câu hỏi NOT mentioned." },
+            14: { ans: "B. Cultivating an equitable and inclusive urban framework", para: "p3-para-5", scroll: "p3-left-scroll", step2: "Đoạn 5 nhấn mạnh việc đảm bảo các lợi ích đô thị được chia sẻ đầy đủ ('fully shared and inclusive') cho người nghèo và người yếu thế.", step3: "Ý chính toàn đoạn hướng tới xây dựng một khung đô thị công bằng, bao trùm.", step4: "Loại A, C, D vì sai lệch trọng tâm cốt lõi của đoạn." },
+            15: { ans: "B. Equitable and strategic distribution of social services", para: "p3-para-5", scroll: "p3-left-scroll", step2: "Xuyên suốt bài đọc, tác giả liên tục kêu gọi quản lý thông minh và phân phối công bằng cơ sở hạ tầng cho mọi tầng lớp.", step3: "Do đó, tác giả sẽ ủng hộ chính sách phân phối chiến lược, công bằng.", step4: "Loại A (phát triển tự phát), C (công nghiệp hóa vô tội vạ) vì ngược quan điểm phát triển bền vững." },
+            16: { ans: "C. urban heat islands", para: "p4-para-3", scroll: "p4-left-scroll", step2: "Đoạn 3 thảo luận: 'Beyond temperature elevation, UHIs exert a deleterious influence... These areas often suffer...'", step3: "Cụm 'These areas' (Những khu vực này) quy chiếu trực tiếp đến danh từ số nhiều UHIs (Urban Heat Islands) ngay trước đó.", step4: "Do đó chọn C." },
+            17: { ans: "B. It represents an inherent and inevitable byproduct of human existence.", para: "p4-para-2", scroll: "p4-left-scroll", step2: "Bài đọc ghi nhận 'waste heat' tỏa ra từ chính sự trao đổi chất của con người ('Human metabolism') và các hoạt động cơ học hằng ngày.", step3: "Điều này chứng minh nó là một sản phẩm phụ tất yếu gắn liền với sự sinh tồn cư trú của con người.", step4: "Loại A vì bài đọc ghi nhận cả hoạt động di chuyển thường nhật chứ không riêng sản xuất công nghiệp." },
+            18: { ans: "A. Covering structural exteriors with flora serves as a thermal mitigation strategy through carbon sequestration and the provision of solar protection.", para: "p4-para-4", scroll: "p4-left-scroll", step2: "Câu gốc: 'The implementation of ‘green roofs’—vegetated building envelopes—facilitates cooling by absorbing carbon dioxide and providing shade.'", step3: "Flora đồng nghĩa với vegetation, structural exteriors đồng nghĩa với building envelopes, thermal mitigation đồng nghĩa với cooling.", step4: "Phương án A giữ trọn vẹn ngữ nghĩa của câu gốc." },
+            19: { ans: "A. The dual degradation of atmospheric and aquatic environments in UHIs.", para: "p4-para-3", scroll: "p4-left-scroll", step2: "Đoạn 3 thảo luận về hai tác động tiêu cực song song của đảo nhiệt đô thị: chất lượng không khí ('air quality') và chất lượng nước ('water quality').", step3: "Do đó, tiêu đề tóm tắt hoàn hảo nhất phải nói về sự suy thoái kép của môi trường khí quyển và thủy sinh.", step4: "Chọn phương án A." },
+            20: { ans: "C. Incorporating cooling-oriented architectural and design interventions.", para: "p4-para-4", scroll: "p4-left-scroll", step2: "Tác giả kết luận bằng việc kêu gọi sử dụng thiết kế bền vững như mái nhà xanh và vật liệu màu sáng phản xạ bức xạ để hạ nhiệt.", step3: "Đây chính là các can thiệp kiến trúc hướng tới làm mát không gian.", step4: "Loại A, B, D vì đi ngược lại lập luận giảm thiểu hấp thụ nhiệt của tác giả." },
+            21: { ans: "A. myriad nations", para: "p5-para-2", scroll: "p5-left-scroll", step2: "Đọc cấu trúc câu: 'Myriad nations will encounter formidable impediments in facilitating the requirements of their burgeoning urban populations...'", step3: "Từ 'their' chỉ quyền sở hữu đối với nhóm dân số bùng nổ của chính vô số các quốc gia đó.", step4: "Do đó chọn câu A." },
+            22: { ans: "B. The preponderance of the projected urban increment will be localized within specific emerging economies.", para: "p5-para-1", scroll: "p5-left-scroll", step2: "Đoạn 1 chỉ rõ phần lớn lượng tăng trưởng khổng lồ này tập trung cao độ ('intensely clustered') vào một nhóm quốc gia chọn lọc, đặc biệt là Ấn Độ, Trung Quốc và Nigeria.", step3: "Điều này có nghĩa là sự gia tăng tập trung vào các nền kinh tế mới nổi cụ thể.", step4: "Loại A vì câu trả lời tuyên bố mở rộng đồng đều trên mọi châu lục, hoàn toàn sai thực tế bài đọc." },
+            23: { ans: "B. Successful urban expansion requires a model where essential resources and safety nets are accessible to everyone, particularly the underprivileged.", para: "p5-para-3", scroll: "p5-left-scroll", step2: "Câu gốc yêu cầu các khung quản trị phải đảm bảo quyền tiếp cận phổ quát cho tất cả mọi người, ưu tiên người nghèo đô thị và nhóm yếu thế.", step3: "Diễn đạt lại hoàn hảo ý nghĩa: tài nguyên và lưới an sinh phải mở rộng tới tất cả mọi cư dân, đặc biệt là tầng lớp yếu thế kém may mắn.", step4: "Chọn phương án B." },
+            24: { ans: "B. Fostering an equitable and inclusive urban framework for the entire citizenry.", para: "p5-para-3", scroll: "p5-left-scroll", step2: "Đoạn 3 nhấn mạnh tầm quan trọng của việc tái cân bằng chiến lược sang mô hình quy hoạch đô thị phân phối tài nguyên theo chủ nghĩa bình đẳng ('egalitarian distribution of resources').", step3: "Mục tiêu tối hậu của quy hoạch đô thị là hướng tới tính công bằng, bao trùm cho toàn bộ người dân công dân.", step4: "Do đó chọn câu B." },
+            25: { ans: "B. A structured and strategic allocation of infrastructure and vital social services.", para: "p5-para-3", scroll: "p5-left-scroll", step2: "Tác giả kết luận bằng việc kêu gọi một sự phối hợp quản trị có hệ thống, đảm bảo an sinh và phân phối nguồn lực có định hướng để xây dựng khả năng phục hồi lâu dài.", step3: "Đây chính là phương pháp phân bổ cơ sở hạ tầng và dịch vụ xã hội một cách có chiến lược và cấu trúc rõ ràng.", step4: "Loại A (buông thả tự phát), D (bắt buộc phi đô thị hóa cưỡng chế) vì hoàn toàn không có dẫn chứng." }
+        };
+
+        let answersStatus = {};
+        let countdownTimer = null;
+        let secondsLeft = 1500; // 25:00
+        let isTimerRunning = false;
+
+        function toggleTimer() {
+            const btn = document.getElementById('time-toggle-btn');
+            if (isTimerRunning) {
+                clearInterval(countdownTimer);
+                btn.innerText = "TIẾP TỤC LÀM BÀI";
+                isTimerRunning = false;
+            } else {
+                isTimerRunning = true;
+                btn.innerText = "TẠM DỪNG";
+                countdownTimer = setInterval(() => {
+                    secondsLeft--;
+                    let mins = Math.floor(secondsLeft / 60);
+                    let secs = secondsLeft % 60;
+                    document.getElementById('time-lbl').innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                    
+                    if (secondsLeft <= 0) {
+                        clearInterval(countdownTimer);
+                        isTimerRunning = false;
+                        btn.innerText = "HẾT GIỜ LÀM BÀI";
+                        alert("Đã hết giờ làm bài. Bạn vẫn có thể tiếp tục làm, nhưng nhớ là trong phòng thi thật, bạn chỉ nên làm một bài như thế này trong 20-25 phút thôi nha.");
+                    }
+                }, 1000);
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-link').forEach((link, idx) => {
+                link.classList.toggle('active', (idx + 1) === tabId);
+            });
+            document.querySelectorAll('.workspace').forEach((pane, idx) => {
+                pane.classList.toggle('active', (idx + 1) === tabId);
+            });
+        }
+
+        function toggleTranslation(boxId) {
+            const box = document.getElementById(boxId);
+            box.style.display = (box.style.display === 'block') ? 'none' : 'block';
+        }
+
+        // Tạo giả lập âm thanh Web Audio API trò chơi hóa
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+        function playGamifiedSound(type) {
+            try {
+                if(!audioCtx) audioCtx = new AudioCtx();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                if(type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                    gain.gain.setValueAtTime(0.12, now);
+                } else {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.linearRampToValueAtTime(90, now + 0.3); // Tèo tèo tèo hạ tần số
+                    gain.gain.setValueAtTime(0.15, now);
+                }
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(now); osc.stop(now + 0.35);
+            } catch(e){}
+        }
+
+        // Bắn pháo hoa ăn mừng
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+        function triggerConfettiBurst() {
+            particles = [];
+            for(let i=0; i<40; i++) {
+                particles.push({
+                    x: canvas.width / 2 + (Math.random() * 200 - 100),
+                    y: canvas.height / 2 + (Math.random() * 200 - 100),
+                    size: Math.random() * 6 + 4,
+                    color: ['#6C5CE7','#00CEC9','#FF7675','#FDCB6E','#00D26A'][Math.floor(Math.random() * 5)],
+                    vX: Math.random() * 8 - 4, vY: Math.random() * 8 - 4
+                });
+            }
+            animateConfetti();
+        }
+        function animateConfetti() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            let remainsActive = false;
+            particles.forEach(p => {
+                p.x += p.vX; p.y += p.vY; p.vY += 0.14;
+                if(p.y < canvas.height) remainsActive = true;
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+            });
+            if(remainsActive) requestAnimationFrame(animateConfetti);
+        }
+
+        // Xử lý kiểm tra đáp án
+        function checkMCQ(qId, selectedKey, correctKey) {
+            if (answersStatus[qId] !== undefined) return;
+
+            const clickedBtn = event.target;
+            const parentCard = clickedBtn.closest('.exercise-card');
+            
+            if (selectedKey === correctKey) {
+                answersStatus[qId] = true;
+                clickedBtn.classList.add('correct-ui');
+                playGamifiedSound('correct');
+                triggerConfettiBurst();
+            } else {
+                answersStatus[qId] = false;
+                clickedBtn.classList.add('wrong-ui');
+                parentCard.classList.add('shake-effect');
+                playGamifiedSound('wrong');
+                setTimeout(() => parentCard.classList.remove('shake-effect'), 400);
+
+                const siblingButtons = parentCard.querySelectorAll('.option-btn');
+                siblingButtons.forEach(btn => {
+                    if (btn.innerText.startsWith(correctKey)) {
+                        btn.classList.add('correct-ui');
+                    }
+                });
+            }
+
+            revealExplanationBox(qId);
+            recalculateProgressBar();
+        }
+
+        function revealExplanationBox(qId) {
+            const expData = detailedExplanations[qId];
+            const targetCard = document.getElementById(`ex-box-${qId}`) || event.target.closest('.exercise-card').querySelector('.explain-box');
+            
+            if (!targetCard || !expData) return;
+
+            targetCard.innerHTML = `
+                <div class="explain-row"><strong>1. ĐÁP ÁN:</strong> ${expData.ans}</div>
+                <div class="explain-row"><strong>2. PHÂN TÍCH CHI TIẾT 4 BƯỚC:</strong></div>
+                <div class="explain-row" style="padding-left:10px;">• <em>Bước 1 - Dịch nghĩa câu hỏi:</em> Trích xuất và làm rõ yêu cầu cốt lõi.</div>
+                <div class="explain-row" style="padding-left:10px;">• <em>Bước 2 - Ngữ cảnh đoạn văn:</em> ${expData.step2}</div>
+                <div class="explain-row" style="padding-left:10px;">• <em>Bước 3 - Vì sao chọn đáp án này:</em> ${expData.step3}</div>
+                <div class="explain-row" style="padding-left:10px;">• <em>Bước 4 - Vì sao loại các đáp án khác:</em> ${expData.step4}</div>
+                <button class="locate-sync-btn" onclick="syncLocateEvidence('${expData.para}', '${expData.scroll}')">鼠标 🖱️ Định vị vị trí dẫn chứng trong bài đọc</button>
+            `;
+            targetCard.style.display = "block";
+        }
+
+        // Cơ chế đồng bộ định vị dẫn chứng (Locate & Sync) độc lập cực cao
+        function syncLocateEvidence(paraId, scrollContainerId) {
+            const paraElement = document.getElementById(paraId);
+            const scrollContainer = document.getElementById(scrollContainerId);
+
+            if (!paraElement || !scrollContainer) return;
+
+            document.querySelectorAll('.paragraph-block').forEach(p => p.classList.remove('located-flash'));
+
+            scrollContainer.scrollTo({
+                top: paraElement.offsetTop - scrollContainer.offsetTop - 15,
+                behavior: 'smooth'
+            });
+
+            paraElement.classList.add('located-flash');
+        }
+
+        function recalculateProgressBar() {
+            const totalQuestions = 25;
+            let answeredCount = Object.keys(answersStatus).length;
+            let percent = Math.round((answeredCount / totalQuestions) * 100);
+
+            document.getElementById('progress-fill-node').style.width = `${percent}%`;
+            document.getElementById('progress-txt-node').innerText = `${percent}%`;
+        }
+
+        function openReportModal() {
+            const totalQuestions = 25;
+            let correctCount = 0;
+
+            for (let key in answersStatus) {
+                if (answersStatus[key] === true) correctCount++;
+            }
+
+            let comment = "";
+            let percentage = (correctCount / totalQuestions) * 100;
+
+            if (percentage >= 85) {
+                comment = "🔥 THIÊN TÀI ĐỌC HIỂU! Kỹ năng tra cứu định vị dẫn chứng và tư duy phân tích synonyms của con vô cùng xuất sắc, đạt chuẩn mức IELTS 8.5+. Tiếp tục phát huy con nhé!";
+            } else if (percentage >= 60) {
+                comment = "🌟 LÀM TỐT LẮM CON! Khả năng phản xạ bám sát văn bản của con rất khá. Con nhớ lưu lại bảng từ vựng nâng cao ở mục Glossary vào sổ tay để bứt phá điểm tuyệt đối nha.";
+            } else {
+                comment = "💪 CỐ LÊN NHÉ CON! Đừng lo lắng, con hãy mở lại hộp giải thích 4 bước sư phạm ở từng câu làm sai để hiểu sâu bản chất cấu trúc và thử sức lại nhé.";
+            }
+
+            document.getElementById('final-score-lbl').innerText = `${correctCount} / ${totalQuestions}`;
+            document.getElementById('final-comment-lbl').innerText = comment;
+            document.getElementById('score-modal').style.display = "flex";
+            
+            if (percentage >= 60) triggerConfettiBurst();
+        }
+
+        function closeModal() {
+            document.getElementById('score-modal').style.display = "none";
+        }
+    </script>
+</body>
+</html>
